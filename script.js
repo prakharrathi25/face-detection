@@ -26,8 +26,8 @@ video.addEventListener('play', () => {
     const resizedDetections = faceapi.resizeResults(detections, displaySize)
 
     //STUDENT LOOK
-
-    var look = false //if looking left or roght then true
+    if(resizedDetections[0]){
+      var look = false //if looking left or roght then true
     const nosetip = resizedDetections[0].landmarks.positions[31]
     const lefteye = resizedDetections[0].landmarks.positions[37]
     const leftcheek = resizedDetections[0].landmarks.positions[2]
@@ -119,10 +119,40 @@ video.addEventListener('play', () => {
       //console.log(eye_status)
       //console.log("AlERT")
     }
-       
- 
 
     //MOUTH OPEN
+    var mouth_open = false
+    const pointsVr = [[49,59],[50,58],[51,57],[52,56],[53,55]]
+    const pointsHz = [48,54]
+    var distv = 0
+    var disthz = 0
+    for(let i=0; i<pointsVr.length; i++){
+      var a = pointsVr[i][0]
+      //console.log(a)
+      //
+      var y1 = resizedDetections[0].landmarks.positions[pointsVr[i][0]].y
+      var point1 = [x1,y1]
+      //
+      var y2 = resizedDetections[0].landmarks.positions[pointsVr[i][1]].y
+      var point2 = [x2,y2]
+      distv += Math.abs(y2 - y1)
+      
+    }
+    var x1 = resizedDetections[0].landmarks.positions[pointsHz[0]].x
+    var x2 = resizedDetections[0].landmarks.positions[pointsHz[1]].x
+    disthz = Math.abs(x2 - x1)
+    //console.log(distv/(4*disthz)) 
+    a = distv/(4*disthz)
+    if(a>0.4){
+      mouth_open = true
+      console.log("OPEN")
+    }
+    else{
+      mouth_open = false
+      console.log("CLOSED")
+    }
+
+    /* //MOUTH OPEN
     var open_status = false 
 
     function top_lip() {
@@ -191,14 +221,14 @@ video.addEventListener('play', () => {
     var prev_open_status = open_status
     if (lip_distance > 25) {
       open_status = true
-      //console.log("Mouth is open")
+      console.log("Mouth is open")
     }
     else {
       open_status = false
-      //console.log("Mouth is closed")
+      console.log("Mouth is closed")
     }
     if (prev_open_status == true && open_status == false)
-      open_count++
+      open_count++ */
 
 
 
@@ -212,6 +242,10 @@ video.addEventListener('play', () => {
     faceapi.draw.drawDetections(canvas, resizedDetections)
     faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
     faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
+    }
+
+    else console.log("no face found")
+    
   }, 1000)
 })
 
