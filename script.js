@@ -24,6 +24,10 @@ video.addEventListener('play', () => {
   setInterval(async () => {
     const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
     const resizedDetections = faceapi.resizeResults(detections, displaySize)
+
+    //STUDENT LOOK
+
+    var look = false //if looking left or roght then true
     const nosetip = resizedDetections[0].landmarks.positions[31]
     const lefteye = resizedDetections[0].landmarks.positions[37]
     const leftcheek = resizedDetections[0].landmarks.positions[2]
@@ -33,21 +37,34 @@ video.addEventListener('play', () => {
     const dist2 = Math.sqrt(Math.pow(nosetip.x - rightcheek.x, 2) + Math.pow(nosetip.y - rightcheek.y, 2))
     const lookLeft1 = dist1 / dist2
     const lookRight1 = dist2 / dist1
-    //console.log(nosetip);
     const dist3 = Math.sqrt(Math.pow(lefteye.x - rightcheek.x, 2) + Math.pow(lefteye.y - rightcheek.y, 2))
     const dist4 = Math.sqrt(Math.pow(righteye.x - rightcheek.x, 2) + Math.pow(righteye.y - rightcheek.y, 2))
     const lookLeft2 = dist3 / dist4
     const lookRight2 = dist4 / dist3
 
-    /* if(lookLeft1>1.9 )
-		console.log("Niggers lookin left")
-	else if(lookRight1>0.78 )
-    console.log("Niggers lookin right")
-    else
-  console.log("Looking straight") */
+     if(lookLeft1>2.2 ){
+       look = true
+       //console.log(look)
+      //console.log("STUDENT IS LOOKING LEFT")
+     }
+		
+	else if(lookRight1>0.78 ){
+    look = true
+    //console.log(look)
+    //console.log("STUDENT IS LOOKING RIGHT")
+  }
+    
+    else{
+      look = false
+      //console.log(look)
+      //console.log("STUDENT IS LOOKING STRAIGHT")
+    }
+  
 
 
     //DROWSINESS
+
+    var eye_status = true //closed eye
 
     function calc_EAR(eye) {
       const A = Math.sqrt(Math.pow(eye[1][0] - eye[5][0], 2) + Math.pow(eye[1][1] - eye[5][1], 2))
@@ -91,13 +108,23 @@ video.addEventListener('play', () => {
 
     var EAR = (Lear + Rear) / 2
     EAR = Math.round((EAR + Number.EPSILON) * 100) / 100
-    /* if(EAR<0.3)
-      console.log("DROWSY BITCH")
-    else
-      console.log("AWAKE") */
-
+      if(EAR<0.3){
+        eye_status = true
+        //console.log(eye_status)
+        //console.log("DROWSY")
+      }
+      
+    else{
+      eye_status = false
+      //console.log(eye_status)
+      //console.log("AlERT")
+    }
+       
+ 
 
     //MOUTH OPEN
+    var open_status = false 
+
     function top_lip() {
       var top_lip_pts = []
       for (let l = 50; l < 53; l++) {
@@ -159,16 +186,16 @@ video.addEventListener('play', () => {
     }
 
     var lip_distance = mouth_open();
-    var open_status = false
-    var open_count = 0
+    
+    var open_count = 0 // can use this to count for how many fraames mouth is open so you can determine a yawn
     var prev_open_status = open_status
     if (lip_distance > 25) {
       open_status = true
-      console.log("Mouth is open")
+      //console.log("Mouth is open")
     }
     else {
       open_status = false
-      console.log("Mouth is closed")
+      //console.log("Mouth is closed")
     }
     if (prev_open_status == true && open_status == false)
       open_count++
@@ -185,6 +212,6 @@ video.addEventListener('play', () => {
     faceapi.draw.drawDetections(canvas, resizedDetections)
     faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
     faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
-  }, 100)
+  }, 1000)
 })
 
